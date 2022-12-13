@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="index.css">
+    </head>
+    <body>
+        <h1>BLACKJACK PAYS 3 TO 2</h1>
+        <div id="DealerCards-el"></div>
+        <p id="message-el">Click to start playing</p>
+        <div id="PlayerHands-el"></div>
+            <div id="PlayerCards-el"></div>
+            <div id="PlayerCards-el1"></div>
+            <div id="PlayerCards-el2"></div>
+            <div id="PlayerCards-el3"></div>
+        </div>
+        <p id="sum-el"></p>
+
+        <br>
+        <button id="hit-el" onclick="player.hit(currentHand)">HIT</button>
+        <button id="stand-el" onclick="player.stand(currentHand)">STAND</button>
+        <button id="double-el" onclick="player.double(currentHand)">DOUBLE</button>
+        <button id="insurance-el" onclick="player.insurance(currentHand)">INSURANCE</button>
+        <button id="split-el" onclick="player.split(currentHand)">SPLIT</button>
+        <br>
+        <button id="start-el" onclick="startRound()">STARTGAME</button>
+        <br>
+        <input id="bet-el" type="number" value="100" step = "50" min="50"/>
+        <p id="chips-el"></p>
+        
+        <script src="index.js"></script>
+    </body>
+</html>

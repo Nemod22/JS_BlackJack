@@ -1,0 +1,29 @@
+body {
+    background-color: #016f32;
+    background-size: cover;
+    text-align: center;
+    color: white;
+    position: center;
+}
+
+h1 {
+    color: goldenrod;
+}
+button {
+    color: goldenrod;
+    width: 150px;
+    background: rgb(53, 53, 53);
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-weight: bold;
+    border: none;
+    border-radius: 2px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+
+.card-image {
+    width: 100px;
+    margin: 3px;
+}
