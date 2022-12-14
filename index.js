@@ -28,7 +28,7 @@ class Deck {
         this.reset()
     }
 
-    reset(packsOfCards = 1) {
+    reset(packsOfCards = 4) {
         const suits = ["hearts", "spades", "diamonds", "clubs"]
         //const values = ["ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace"]
         const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace"]
@@ -58,7 +58,7 @@ class Deck {
         return this;
     }
 
-    draw(reshufleAt = 0.5, packsOfCards = 1) {
+    draw(reshufleAt = 0.5, packsOfCards = 4) {
         let cardsInPack = 52
         //draw or first reset deck
         if (this.deck.length > packsOfCards * cardsInPack * reshufleAt) {
@@ -151,7 +151,7 @@ class Player {
     hit(hand) {
         if (hand.isInPlay === true) {
             hand.dealOne(deck)
-            sumEl.textContent = hand.sum()
+            sumEl.textContent = "sum: " + hand.sum()
             if (hand.sum() >= 21) {
                 hand.isInPlay = false
                 nextHand()
@@ -177,8 +177,7 @@ class Player {
                 hand.chips -= this.bet
                 hand.bet *= 2
                 hand.dealOne(deck)
-                dealer.play()
-                this.resolve(hand)
+                nextHand()
         }
     }
     
@@ -248,10 +247,11 @@ class Dealer {
         this.hand = new Hand(document.getElementById("DealerCards-el"))
     }
 
-    play() {
+    async play() {
         this.hand.cards[0].faceDown = false
         this.hand.rerender()
         while (this.hand.sum() < 17) {
+            await sleep(1000)
             this.hand.dealOne(deck)
         }
     }
@@ -310,14 +310,16 @@ async function nextHand() {
     n += 1
     if (n < player.hands.length) {
         currentHand = player.hands[n]
+        sumEl.textContent = currentHand.sum()
         console.log(currentHand)
     }
     else {
-        dealer.play()
+        await dealer.play()
+        await sleep(1000)
         for (let i = 0; i < player.hands.length; i++) {
             let hand = player.hands[i]
             player.resolve(hand)
-            await sleep(1000)
+            await sleep(2000)
         }
     }
 }

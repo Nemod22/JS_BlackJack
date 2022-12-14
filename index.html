@@ -6,7 +6,7 @@
     <body>
         <h1>BLACKJACK PAYS 3 TO 2</h1>
         <div id="DealerCards-el"></div>
-        <p id="message-el">Click to start playing</p>
+        <p id="message-el"></p>
         <div id="PlayerHands-el"></div>
             <div id="PlayerCards-el"></div>
             <div id="PlayerCards-el1"></div>
@@ -18,12 +18,14 @@
         <br>
         <button id="hit-el" onclick="player.hit(currentHand)">HIT</button>
         <button id="stand-el" onclick="player.stand(currentHand)">STAND</button>
+        <br>
         <button id="double-el" onclick="player.double(currentHand)">DOUBLE</button>
         <button id="insurance-el" onclick="player.insurance(currentHand)">INSURANCE</button>
         <button id="split-el" onclick="player.split(currentHand)">SPLIT</button>
         <br>
         <button id="start-el" onclick="startRound()">STARTGAME</button>
         <br>
+        <div>Bet:</div>
         <input id="bet-el" type="number" value="100" step = "50" min="50"/>
         <p id="chips-el"></p>
         
