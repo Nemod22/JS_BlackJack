@@ -280,28 +280,31 @@ deck.shuffle()
 
 function startRound() {
     player.bet = document.getElementById("bet-el").value
-    document.getElementById("start-el").style.visibility = 'hidden'
-    hitButton.style.visibility = 'visible'
-    standButton.style.visibility = 'visible'
-    doubleButton.style.visibility = 'visible'
-    insuranceButton.style.visibility = 'visible'
-    splitButton.style.visibility = 'visible'
-    messageEl.textContent = "_"
-    player.hands[0].isInPlay = true
-    //player.hands[0].clear()
-    player.clearHands()
-    player.removeAllButFirstHand()
-    console.log(player.hands)
-    dealer.hand.clear()
-    player.chips -= player.bet
-    player.hands[0].dealOne(deck)
-    player.hands[0].dealOne(deck)
-    dealer.hand.dealOne(deck, faceDown = true)
-    dealer.hand.dealOne(deck)
-    currentHand = player.hands[0]
-    sumEl.textContent = "sum: " + player.hands[0].sum()
-    chipsEl.textContent = "chips: " + player.chips
-    n = 0
+    if (player.bet > 0 && player.bet <= player.chips) {
+        document.getElementById("start-el").style.visibility = 'hidden'
+        hitButton.style.visibility = 'visible'
+        standButton.style.visibility = 'visible'
+        doubleButton.style.visibility = 'visible'
+        insuranceButton.style.visibility = 'visible'
+        splitButton.style.visibility = 'visible'
+        messageEl.textContent = "_"
+        player.hands[0].isInPlay = true
+        //player.hands[0].clear()
+        player.clearHands()
+        player.removeAllButFirstHand()
+        console.log(player.hands)
+        dealer.hand.clear()
+        player.chips -= player.bet
+        player.hands[0].dealOne(deck)
+        player.hands[0].dealOne(deck)
+        dealer.hand.dealOne(deck, faceDown = true)
+        dealer.hand.dealOne(deck)
+        currentHand = player.hands[0]
+        sumEl.textContent = "sum: " + player.hands[0].sum()
+        chipsEl.textContent = "chips: " + player.chips
+        n = 0
+    }
+    else {messageEl.textContent = "Invalid bet"}
 }
 
 let n = 0
