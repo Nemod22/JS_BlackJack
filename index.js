@@ -121,13 +121,6 @@ class Hand {
     }
 }
 
-// class PlayerHand extends Hand {
-
-//     constructor (cardsEl) {
-//         super(cardsEl)
-//         this.isInPlay = true
-//     }
-// }
 
 class Player {
     constructor(chips = 1000) {
@@ -191,7 +184,6 @@ class Player {
         if (hand.cards[0].value === hand.cards[1].value && hand.cards.length === 2 && this.hands.length < 4) {
             this.chips -= this.bet
             let secondCard = hand.cards.pop()
-            //console.log(`PlayerCards-el${this.hands.length}`)
             let newhand = new Hand(document.getElementById(`PlayerCards-el${this.hands.length}`))
             newhand.cards.push(secondCard)
             this.hands.push(newhand)
@@ -230,13 +222,8 @@ class Player {
             //player losees
             messageEl.textContent = "You loose."
         }
-        hitButton.style.visibility = 'hidden'
-        standButton.style.visibility = 'hidden'
-        doubleButton.style.visibility = 'hidden'
-        insuranceButton.style.visibility = 'hidden'
-        splitButton.style.visibility = 'hidden'
+        actionButtons.style.visibility = 'hidden'
         document.getElementById("start-el").style.visibility = 'visible'
-        document.getElementById("start-el").textContent = 'NEW ROUND'
         chipsEl.textContent = "chips: " + player.chips
     }
 
@@ -257,20 +244,14 @@ class Dealer {
     }
 
 }
-let hitButton = document.getElementById("hit-el")
-let standButton = document.getElementById("stand-el")
-let doubleButton = document.getElementById("double-el")
-let insuranceButton = document.getElementById("insurance-el")
-let splitButton = document.getElementById('split-el')
+
+let actionButtons = document.getElementById("actionButtons-el")
 let messageEl = document.getElementById("message-el")
 let sumEl = document.getElementById("sum-el")
-chipsEl = document.getElementById("chips-el")
+let chipsEl = document.getElementById("chips-el")
+let settingsEl = document.getElementById("settings-el")
 
-hitButton.style.visibility = 'hidden'
-standButton.style.visibility = 'hidden'
-doubleButton.style.visibility = 'hidden'
-insuranceButton.style.visibility = 'hidden'
-splitButton.style.visibility = 'hidden'
+let deckCount = document.getElementById('deckCount').value
 
 //let players = [new Player]
 let player = new Player
@@ -280,13 +261,10 @@ deck.shuffle()
 
 function startRound() {
     player.bet = document.getElementById("bet-el").value
+    settingsEl.style.display = 'none' //'block' to make visible
     if (player.bet > 0 && player.bet <= player.chips) {
         document.getElementById("start-el").style.visibility = 'hidden'
-        hitButton.style.visibility = 'visible'
-        standButton.style.visibility = 'visible'
-        doubleButton.style.visibility = 'visible'
-        insuranceButton.style.visibility = 'visible'
-        splitButton.style.visibility = 'visible'
+        actionButtons.style.visibility = 'visible'
         messageEl.textContent = "_"
         player.hands[0].isInPlay = true
         //player.hands[0].clear()
@@ -297,7 +275,7 @@ function startRound() {
         player.chips -= player.bet
         player.hands[0].dealOne(deck)
         player.hands[0].dealOne(deck)
-        dealer.hand.dealOne(deck, faceDown = true)
+        dealer.hand.dealOne(deck, faceDown=true)
         dealer.hand.dealOne(deck)
         currentHand = player.hands[0]
         sumEl.textContent = "sum: " + player.hands[0].sum()
