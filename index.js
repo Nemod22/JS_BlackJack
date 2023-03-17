@@ -24,17 +24,22 @@ class Card {
 }
 
 class Deck {
-    constructor() {
-        this.reset()
+    constructor(packsOfCards, reshufleAt) {
+        this.packsOfCards = packsOfCards
+        this.reshufleAt = reshufleAt
+        this.reset(packsOfCards, reshufleAt)
+        this.shuffle()
     }
 
-    reset(packsOfCards = 4) {
+    reset() {
         const suits = ["hearts", "spades", "diamonds", "clubs"]
+        //const values = ["5", "5", "5", "5", "5", "5", "5", "5", "5", "5", "5", "5", "5", ]
         //const values = ["ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace"]
         const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace"]
         this.deck = []
 
-        for (let i = 0; i < packsOfCards; i++) {
+
+        for (let i = 0; i < this.packsOfCards; i++) {
             for (let j = 0; j < suits.length; j++) {
                 for (let k = 0; k < values.length; k++) {
                     this.deck.push([suits[j], values[k]])
@@ -58,10 +63,11 @@ class Deck {
         return this;
     }
 
-    draw(reshufleAt = 0.5, packsOfCards = 4) {
+    draw() {
         let cardsInPack = 52
-        //draw or first reset deck
-        if (this.deck.length > packsOfCards * cardsInPack * reshufleAt) {
+        //draw or first reset and reset deck
+        console.log(this.packsOfCards * cardsInPack * this.reshufleAt)
+        if (this.deck.length > this.packsOfCards * cardsInPack * this.reshufleAt) {
             let cardProperties = this.deck.pop() //[suit, value]
             return new Card(cardProperties[0], cardProperties[1])
         }
@@ -137,83 +143,84 @@ class Player {
     }
 
     removeAllButFirstHand() {
-        let hand = 
+        //let hand = 
         this.hands = [this.hands[0]]
     }
 
-    hit(hand) {
+    hit(game, hand) {
         if (hand.isInPlay === true) {
-            hand.dealOne(deck)
+            hand.dealOne(game.deck)
             sumEl.textContent = "sum: " + hand.sum()
             if (hand.sum() >= 21) {
                 hand.isInPlay = false
-                nextHand()
+                game.nextHand()
             }
             if (hand.isInPlay === false) {
-                this.stand(hand)
+                this.stand(game, hand)
             }
         }
     }
     
-    stand(hand) {
+    stand(game, hand) {
         if (hand.isInPlay === true) {
             hand.isInPlay = false
             //dealer.play()
             //this.resolve(hand)
-            nextHand()
+            game.nextHand()
         }
     }
     
-    double(hand) {
+    double(game, hand) {
         if (hand.isInPlay === true && (hand.sum() === 11 || hand.sum() === 10)) {
                 hand.isInPlay = false
                 hand.chips -= this.bet
                 hand.bet *= 2
-                hand.dealOne(deck)
-                nextHand()
+                hand.dealOne(game.deck)
+                sumEl.textContent = "sum: " + hand.sum()
+                game.nextHand()
         }
     }
     
     insurance() {
-        if (dealer.hand.cards[1].value === "ace") {
+        if (game.dealer.hand.cards[1].value === "ace") {
             console.log("ok")
         }
     }
     
-    split(hand) {
+    split(game, hand) {
         if (hand.cards[0].value === hand.cards[1].value && hand.cards.length === 2 && this.hands.length < 4) {
             this.chips -= this.bet
             let secondCard = hand.cards.pop()
             let newhand = new Hand(document.getElementById(`PlayerCards-el${this.hands.length}`))
             newhand.cards.push(secondCard)
             this.hands.push(newhand)
-            hand.dealOne(deck)
-            newhand.dealOne(deck)
+            hand.dealOne(game.deck)
+            newhand.dealOne(game.deck)
             hand.rerender()
             newhand.rerender()
             console.log(this.hands)
         }
     }
 
-    resolve(hand) {
-        if (hand.sum() > 21 || (dealer.hand.sum() === 21 && dealer.hand.cards.length === 2)) {
+    resolve(game, hand) {
+        if (hand.sum() > 21 || (game.dealer.hand.sum() === 21 && game.dealer.hand.cards.length === 2)) {
             // player loses
             messageEl.textContent = "Bust! You loose."
         }
 
-        else if (hand.sum() === 21 && hand.cards.length === 2 && !(dealer.hand.cards.length == 2 && dealer.hand.sum == 21)) {
+        else if (hand.sum() === 21 && hand.cards.length === 2 && !(game.dealer.hand.cards.length == 2 && game.dealer.hand.sum == 21)) {
             //players wins blackjack
-            this.chips += (this.bet * 5 / 2)
+            this.chips += Math.round(this.bet * (eval(BlackJackPayout) + 1))
             messageEl.textContent = "BlackJack win!"
         }
 
-        else if (hand.sum() === dealer.hand.sum()) {
+        else if (hand.sum() === game.dealer.hand.sum()) {
             //draw
             this.chips += (this.bet * 1)
             messageEl.textContent = "It's a draw"
         }
 
-        else if (hand.sum() > dealer.hand.sum() || dealer.hand.sum() > 21) {
+        else if (hand.sum() > game.dealer.hand.sum() || game.dealer.hand.sum() > 21) {
             //player wins
             this.chips += (this.bet * 2)
             messageEl.textContent = "You win!"
@@ -224,7 +231,7 @@ class Player {
         }
         actionButtons.style.visibility = 'hidden'
         document.getElementById("start-el").style.visibility = 'visible'
-        chipsEl.textContent = "chips: " + player.chips
+        chipsEl.textContent = "chips: " + game.player.chips
     }
 
 }
@@ -239,10 +246,75 @@ class Dealer {
         this.hand.rerender()
         while (this.hand.sum() < 17) {
             await sleep(1000)
-            this.hand.dealOne(deck)
+            this.hand.dealOne(game.deck)
         }
     }
 
+}
+
+class Game {
+    constructor() {
+        this.reset
+    }
+
+    reset() { //current hand global
+        this.deck = new Deck(deckCount, ReshuffleDeckAt)
+        this.player = new Player
+        this.dealer = new Dealer
+        this.settings = 0
+        var currentHand = this.player.hands[0]
+        this.n = 0
+        this.startRound()
+    }
+
+    startRound() {
+        this.player.bet = document.getElementById("bet-el").value
+        settingsEl.style.display = 'none' //'block' to make visible
+        if (this.player.bet > 0 && this.player.bet <= this.player.chips) {
+            document.getElementById("start-el").style.visibility = 'hidden'
+            actionButtons.style.visibility = 'visible'
+            messageEl.textContent = "_"
+            this.player.hands[0].isInPlay = true
+            //player.hands[0].clear()
+            this.player.clearHands()
+            this.player.removeAllButFirstHand()
+            console.log(this.player.hands)
+            this.dealer.hand.clear()
+            this.player.chips -= this.player.bet
+            this.player.hands[0].dealOne(this.deck)
+            this.player.hands[0].dealOne(this.deck)
+            this.dealer.hand.dealOne(this.deck, true) //faceDown = true
+            this.dealer.hand.dealOne(this.deck)
+            this.currentHand = this.player.hands[0]
+            sumEl.textContent = "sum: " + this.player.hands[0].sum()
+            chipsEl.textContent = "chips: " + this.player.chips
+            this.n = 0
+        }
+        
+        else {messageEl.textContent = "Invalid bet"}
+    }
+
+    async nextHand() {
+        this.n += 1
+        if (this.n < this.player.hands.length) {
+            currentHand = this.player.hands[this.n]
+            sumEl.textContent = currentHand.sum()
+            console.log(currentHand)
+        }
+        else {
+            await this.dealer.play()
+            await sleep(1000)
+            for (let i = 0; i < this.player.hands.length; i++) {
+                let hand = this.player.hands[i]
+                this.player.resolve(this, hand)
+                await sleep(2000)
+            }
+        } 
+    }
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 let actionButtons = document.getElementById("actionButtons-el")
@@ -251,60 +323,8 @@ let sumEl = document.getElementById("sum-el")
 let chipsEl = document.getElementById("chips-el")
 let settingsEl = document.getElementById("settings-el")
 
-let deckCount = document.getElementById('deckCount').value
-
-//let players = [new Player]
-let player = new Player
-let deck = new Deck
-let dealer = new Dealer
-deck.shuffle()
-
-function startRound() {
-    player.bet = document.getElementById("bet-el").value
-    settingsEl.style.display = 'none' //'block' to make visible
-    if (player.bet > 0 && player.bet <= player.chips) {
-        document.getElementById("start-el").style.visibility = 'hidden'
-        actionButtons.style.visibility = 'visible'
-        messageEl.textContent = "_"
-        player.hands[0].isInPlay = true
-        //player.hands[0].clear()
-        player.clearHands()
-        player.removeAllButFirstHand()
-        console.log(player.hands)
-        dealer.hand.clear()
-        player.chips -= player.bet
-        player.hands[0].dealOne(deck)
-        player.hands[0].dealOne(deck)
-        dealer.hand.dealOne(deck, faceDown=true)
-        dealer.hand.dealOne(deck)
-        currentHand = player.hands[0]
-        sumEl.textContent = "sum: " + player.hands[0].sum()
-        chipsEl.textContent = "chips: " + player.chips
-        n = 0
-    }
-    else {messageEl.textContent = "Invalid bet"}
-}
-
-let n = 0
-let currentHand = player.hands[0]
-async function nextHand() {
-    n += 1
-    if (n < player.hands.length) {
-        currentHand = player.hands[n]
-        sumEl.textContent = currentHand.sum()
-        console.log(currentHand)
-    }
-    else {
-        await dealer.play()
-        await sleep(1000)
-        for (let i = 0; i < player.hands.length; i++) {
-            let hand = player.hands[i]
-            player.resolve(hand)
-            await sleep(2000)
-        }
-    }
-}
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+var deckCount = Number(document.getElementById('deckCount').value)
+var BlackJackPayout = document.getElementById('BlackJackPayout').value
+var DealerHitsSoft17 = document.getElementById('DealerHitsSoft17').value
+var ReshuffleDeckAt = Number(document.getElementById('ReshuffleDeckAt').value)
+let game = new Game
