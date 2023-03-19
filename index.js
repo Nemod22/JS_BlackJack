@@ -213,9 +213,13 @@ class Player {
     }
 
     resolve(game, hand) {
-        if (hand.sum() > 21 || (game.dealer.hand.sum() === 21 && game.dealer.hand.cards.length === 2)) {
+        if (hand.sum() > 21) {
             // player loses
             messageEl.textContent = "Bust! You loose."
+        }
+        else if ((game.dealer.hand.sum() === 21 && game.dealer.hand.cards.length === 2 && !(hand.sum() === 21 && hand.cards.length === 2))){
+            //dealer has blackjack, player does not
+            messageEl.textContent = "You loose."
         }
 
         else if (hand.sum() === 21 && hand.cards.length === 2 && !(game.dealer.hand.cards.length == 2 && game.dealer.hand.sum == 21)) {
