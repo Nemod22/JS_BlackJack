@@ -133,6 +133,7 @@ class Player {
         this.chips = chips
         this.hands = [new Hand(document.getElementById("PlayerCards-el"))]
         this.bet = 100
+        this.insuranceFlag = false
     }
 
     clearHands(){
@@ -180,11 +181,20 @@ class Player {
                 game.nextHand()
         }
     }
-    
-    insurance() {
-        if (game.dealer.hand.cards[1].value === "ace") {
-            console.log("ok")
+
+    insurance(game) {
+        if (game.dealer.hand.cards[1].value === "ace" && this.insuranceFlag === false) {
+            this.insuranceFlag = true;
+            this.chips -= (this.bet * 1)
+            console.log("insured");
         }
+    }
+
+    insurancePayout(game) {
+        if (this.insuranceFlag === true && (game.dealer.hand.sum() === 21 && game.dealer.hand.cards.length === 2)){
+            this.chips += (this.bet * 2)
+        }
+        this.insuranceFlag = false
     }
     
     split(game, hand) {
@@ -257,12 +267,12 @@ class Game {
         this.reset
     }
 
-    reset() { //current hand global
+    reset() {
         this.deck = new Deck(deckCount, ReshuffleDeckAt)
         this.player = new Player
         this.dealer = new Dealer
         this.settings = 0
-        var currentHand = this.player.hands[0]
+        this.currentHand = this.player.hands[0]
         this.n = 0
         this.startRound()
     }
@@ -297,12 +307,13 @@ class Game {
     async nextHand() {
         this.n += 1
         if (this.n < this.player.hands.length) {
-            currentHand = this.player.hands[this.n]
-            sumEl.textContent = currentHand.sum()
-            console.log(currentHand)
+            this.currentHand = this.player.hands[this.n]
+            sumEl.textContent = this.currentHand.sum()
+            console.log(this.currentHand)
         }
         else {
             await this.dealer.play()
+            this.player.insurancePayout(this)
             await sleep(1000)
             for (let i = 0; i < this.player.hands.length; i++) {
                 let hand = this.player.hands[i]

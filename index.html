@@ -38,7 +38,7 @@
                 <option value="Yes">Yes</option>
             </select>
             <br>
-            <label for="ReshuffleDeckAt">Reshuffle deck at:</label>
+            <label for="ReshuffleDeckAt">Reshuffle shoe at:</label>
             <input id="ReshuffleDeckAt" name="ReshuffleDeckAt"type="number" min="0" max="1" step="0.01" value="0.5"/>
             <br>
             <button onclick="game.reset()">START GAME</button>
@@ -61,7 +61,7 @@
             <button id="stand-el" onclick="game.player.stand(game, game.currentHand)">STAND</button>
             <br>
             <button id="double-el" onclick="game.player.double(game, game.currentHand)">DOUBLE</button>
-            <button id="insurance-el" onclick="game.player.insurance(game.currentHand)">INSURANCE</button>
+            <button id="insurance-el" onclick="game.player.insurance(game)">INSURANCE</button>
             <button id="split-el" onclick="game.player.split(game, game.currentHand)">SPLIT</button>
         </div>
         <br>
