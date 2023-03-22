@@ -172,6 +172,7 @@ class Player {
                 this.stand(game, hand)
             }
         }
+        game.disableUnavailableActions()
     }
     
     stand(game, hand) {
@@ -183,8 +184,15 @@ class Player {
         }
     }
     
+    canDouble(hand) {
+        if (hand.isInPlay === true && hand.cards.length === 2) {
+            return true
+        }
+        return false
+    }
+
     double(game, hand) {
-        if (hand.isInPlay === true && (hand.sum === 11 || hand.sum === 10)) {
+        if (this.canDouble(hand)) {
                 hand.isInPlay = false
                 this.chips -= this.bet
                 hand.bet *= 2
@@ -193,12 +201,21 @@ class Player {
                 game.nextHand()
         }
     }
+    
+    canInsure(game) {
+        if (game.dealer.hand.cards[1].value === "ace" && this.insuranceFlag === false){
+            return true
+        }
+        return false
+    }
 
     insurance(game) {
-        if (game.dealer.hand.cards[1].value === "ace" && this.insuranceFlag === false) {
+        if (this.canInsure(game)) {
             this.insuranceFlag = true;
             this.chips -= (this.bet * 1)
-            console.log("insured");
+            messageEl.textContent = "insured"
+            console.log("insured")
+            game.disableUnavailableActions()
         }
     }
 
@@ -209,8 +226,15 @@ class Player {
         this.insuranceFlag = false
     }
     
-    split(game, hand) {
+    canSplit(hand) {
         if (hand.cards[0].value === hand.cards[1].value && hand.cards.length === 2 && this.hands.length < 4) {
+            return true
+        }
+        return false
+    }
+
+    split(game, hand) {
+        if (this.canSplit(hand)) {
             this.chips -= this.bet
             let secondCard = hand.cards.pop()
             let newhand = new Hand(document.getElementById(`PlayerCards-el${this.hands.length}`))
@@ -220,6 +244,7 @@ class Player {
             newhand.dealOne(game.deck)
             hand.rerender()
             newhand.rerender()
+            game.disableUnavailableActions()
             console.log(this.hands)
         }
     }
@@ -321,9 +346,25 @@ class Game {
             sumEl.textContent = "sum: " + this.player.hands[0].sum
             chipsEl.textContent = "chips: " + this.player.chips
             this.n = 0
+            this.disableUnavailableActions()
         }
         
         else {messageEl.textContent = "Invalid bet"}
+    }
+
+    disableUnavailableActions() {
+        document.getElementById("double-el").disabled = true;
+        document.getElementById("insurance-el").disabled = true;
+        document.getElementById("split-el").disabled = true;
+        if (this.player.canDouble(this.currentHand)) {
+            document.getElementById("double-el").disabled = false;
+        }
+        if (this.player.canInsure(this)) {
+            document.getElementById("insurance-el").disabled = false;
+        }
+        if (this.player.canSplit(this.currentHand)) {
+            document.getElementById("split-el").disabled = false;
+        }
     }
 
     async nextHand() {
