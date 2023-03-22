@@ -66,7 +66,7 @@ class Deck {
     draw() {
         let cardsInPack = 52
         //draw or first reset and reset deck
-        console.log(this.packsOfCards * cardsInPack * this.reshufleAt)
+        //console.log(this.packsOfCards * cardsInPack * this.reshufleAt)
         if (this.deck.length > this.packsOfCards * cardsInPack * this.reshufleAt) {
             let cardProperties = this.deck.pop() //[suit, value]
             return new Card(cardProperties[0], cardProperties[1])
@@ -94,9 +94,10 @@ class Hand {
         this.CardsEl.innerHTML += `<img class="card-image" src="${card.image}">`
     }
 
-    sum() {
+    sumFun() {
         let sum = 0
         let numOfAces = 0
+        let soft = false
         for (let i = 0; i < this.cards.length; i++) {
             let card = this.cards[i]
             if (!card.faceDown) {
@@ -110,7 +111,18 @@ class Hand {
             numOfAces--
             sum -= 10
         }
-        return sum
+        if (numOfAces > 0){
+            soft = true
+        }
+        return [sum, soft]
+    }
+
+    get sum() {
+        return this.sumFun()[0]
+    }
+
+    get isSoft() {
+        return this.sumFun()[1]
     }
 
     clear() {
@@ -151,8 +163,8 @@ class Player {
     hit(game, hand) {
         if (hand.isInPlay === true) {
             hand.dealOne(game.deck)
-            sumEl.textContent = "sum: " + hand.sum()
-            if (hand.sum() >= 21) {
+            sumEl.textContent = "sum: " + hand.sum
+            if (hand.sum >= 21) {
                 hand.isInPlay = false
                 game.nextHand()
             }
@@ -172,12 +184,12 @@ class Player {
     }
     
     double(game, hand) {
-        if (hand.isInPlay === true && (hand.sum() === 11 || hand.sum() === 10)) {
+        if (hand.isInPlay === true && (hand.sum === 11 || hand.sum === 10)) {
                 hand.isInPlay = false
-                hand.chips -= this.bet
+                this.chips -= this.bet
                 hand.bet *= 2
                 hand.dealOne(game.deck)
-                sumEl.textContent = "sum: " + hand.sum()
+                sumEl.textContent = "sum: " + hand.sum
                 game.nextHand()
         }
     }
@@ -191,7 +203,7 @@ class Player {
     }
 
     insurancePayout(game) {
-        if (this.insuranceFlag === true && (game.dealer.hand.sum() === 21 && game.dealer.hand.cards.length === 2)){
+        if (this.insuranceFlag === true && (game.dealer.hand.sum === 21 && game.dealer.hand.cards.length === 2)){
             this.chips += (this.bet * 2)
         }
         this.insuranceFlag = false
@@ -213,28 +225,28 @@ class Player {
     }
 
     resolve(game, hand) {
-        if (hand.sum() > 21) {
+        if (hand.sum > 21) {
             // player loses
             messageEl.textContent = "Bust! You loose."
         }
-        else if ((game.dealer.hand.sum() === 21 && game.dealer.hand.cards.length === 2 && !(hand.sum() === 21 && hand.cards.length === 2))){
+        else if ((game.dealer.hand.sum === 21 && game.dealer.hand.cards.length === 2 && !(hand.sum === 21 && hand.cards.length === 2))){
             //dealer has blackjack, player does not
             messageEl.textContent = "You loose."
         }
 
-        else if (hand.sum() === 21 && hand.cards.length === 2 && !(game.dealer.hand.cards.length == 2 && game.dealer.hand.sum == 21)) {
+        else if (hand.sum === 21 && hand.cards.length === 2 && !(game.dealer.hand.cards.length == 2 && game.dealer.hand.sum == 21)) {
             //players wins blackjack
             this.chips += Math.round(this.bet * (eval(BlackJackPayout) + 1))
             messageEl.textContent = "BlackJack win!"
         }
 
-        else if (hand.sum() === game.dealer.hand.sum()) {
+        else if (hand.sum === game.dealer.hand.sum) {
             //draw
             this.chips += (this.bet * 1)
             messageEl.textContent = "It's a draw"
         }
 
-        else if (hand.sum() > game.dealer.hand.sum() || game.dealer.hand.sum() > 21) {
+        else if (hand.sum > game.dealer.hand.sum || game.dealer.hand.sum > 21) {
             //player wins
             this.chips += (this.bet * 2)
             messageEl.textContent = "You win!"
@@ -251,14 +263,15 @@ class Player {
 }
 
 class Dealer {
-    constructor() {
+    constructor(hitSoft) {
         this.hand = new Hand(document.getElementById("DealerCards-el"))
+        this.hitSoft = hitSoft
     }
 
     async play() {
         this.hand.cards[0].faceDown = false
         this.hand.rerender()
-        while (this.hand.sum() < 17) {
+        while (this.hand.sum < 17 || (this.hand.sum === 17 && this.hand.isSoft && this.hitSoft)) {
             await sleep(1000)
             this.hand.dealOne(game.deck)
         }
@@ -272,9 +285,14 @@ class Game {
     }
 
     reset() {
+        let deckCount = Number(document.getElementById('deckCount').value)
+        let BlackJackPayout = document.getElementById('BlackJackPayout').value
+        let DealerHitsSoft17 = (document.getElementById('DealerHitsSoft17').value == "Yes") //sets variable to true or false
+        let ReshuffleDeckAt = Number(document.getElementById('ReshuffleDeckAt').value)
+
         this.deck = new Deck(deckCount, ReshuffleDeckAt)
         this.player = new Player
-        this.dealer = new Dealer
+        this.dealer = new Dealer(DealerHitsSoft17)
         this.settings = 0
         this.currentHand = this.player.hands[0]
         this.n = 0
@@ -300,7 +318,7 @@ class Game {
             this.dealer.hand.dealOne(this.deck, true) //faceDown = true
             this.dealer.hand.dealOne(this.deck)
             this.currentHand = this.player.hands[0]
-            sumEl.textContent = "sum: " + this.player.hands[0].sum()
+            sumEl.textContent = "sum: " + this.player.hands[0].sum
             chipsEl.textContent = "chips: " + this.player.chips
             this.n = 0
         }
@@ -312,7 +330,7 @@ class Game {
         this.n += 1
         if (this.n < this.player.hands.length) {
             this.currentHand = this.player.hands[this.n]
-            sumEl.textContent = this.currentHand.sum()
+            sumEl.textContent = this.currentHand.sum
             console.log(this.currentHand)
         }
         else {
@@ -338,8 +356,4 @@ let sumEl = document.getElementById("sum-el")
 let chipsEl = document.getElementById("chips-el")
 let settingsEl = document.getElementById("settings-el")
 
-var deckCount = Number(document.getElementById('deckCount').value)
-var BlackJackPayout = document.getElementById('BlackJackPayout').value
-var DealerHitsSoft17 = document.getElementById('DealerHitsSoft17').value
-var ReshuffleDeckAt = Number(document.getElementById('ReshuffleDeckAt').value)
 let game = new Game
