@@ -188,7 +188,7 @@ class Player {
     }
     
     canDouble(hand) {
-        if (hand.isInPlay === true && hand.cards.length === 2) {
+        if (hand.isInPlay === true && hand.cards.length === 2 && this.chips >= this.bet) {
             return true
         }
         return false
@@ -198,7 +198,7 @@ class Player {
         if (this.canDouble(hand)) {
                 hand.isInPlay = false
                 this.chips -= this.bet
-                hand.bet *= 3
+                this.bet *= 2
                 hand.dealOne(game.deck)
                 sumEl.textContent = "sum: " + hand.sum
                 game.nextHand()
@@ -206,7 +206,7 @@ class Player {
     }
     
     canInsure(game) {
-        if (game.dealer.hand.cards[1].value === "ace" && this.insuranceFlag === false){
+        if (game.dealer.hand.cards[1].value === "ace" && this.insuranceFlag === false && this.chips >= this.bet){
             return true
         }
         return false
@@ -230,7 +230,7 @@ class Player {
     }
     
     canSplit(hand) {
-        if (hand.cards[0].value === hand.cards[1].value && hand.cards.length === 2 && this.hands.length < 4) {
+        if (hand.cards[0].value === hand.cards[1].value && hand.cards.length === 2 && this.hands.length < 4 && this.chips >= this.bet) {
             return true
         }
         return false
@@ -357,7 +357,7 @@ class Game {
             this.n = 0
             this.disableUnavailableActions()
             if (this.player.hands[0].sum === 21) {
-                this.player.hands[0].resolve()
+                this.player.resolve(this, this.player.hands[0])
             }
         }
         
