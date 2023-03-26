@@ -4,7 +4,48 @@
         <link rel="stylesheet" href="index.css">
     </head>
     <body>
-        <h1>BLACKJACK PAYS 3 TO 2</h1>
+        <div id="settings-el">
+        <!-- 
+            deck count
+            deck penetration
+            starting chips
+            blackjack payout
+            dealer hits on soft 17
+            max hands allowed
+         -->
+            <br>
+            <label for="deckCount">Number of decks:</label>
+            <select name="deckCount" id="deckCount">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+            </select>
+            <br>
+            <label for="BlackJackPayout">BlackJack payout:</label>
+            <select name="BlackJackPayout" id="BlackJackPayout">
+                <option value="3/2">3/2</option>
+                <option value="6/5">6/5</option>
+            </select>
+            <br>
+            <label for="DealerHitsSoft17">Dealer hits soft 17:</label>
+            <select name="DealerHitsSoft17" id="DealerHitsSoft17">
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+            </select>
+            <br>
+            <label for="ReshuffleDeckAt">Reshuffle shoe at:</label>
+            <input id="ReshuffleDeckAt" name="ReshuffleDeckAt"type="number" min="0" max="1" step="0.01" value="0.5"/>
+            <br>
+            <button onclick="game.reset()">START GAME</button>
+
+        </div>
+
+        <h1>BLACKJACK</h1>
         <div id="DealerCards-el"></div>
         <p id="message-el"></p>
         <div id="PlayerHands-el"></div>
@@ -14,19 +55,20 @@
             <div id="PlayerCards-el3"></div>
         </div>
         <p id="sum-el"></p>
-
         <br>
-        <button id="hit-el" onclick="player.hit(currentHand)">HIT</button>
-        <button id="stand-el" onclick="player.stand(currentHand)">STAND</button>
-        <br>
-        <button id="double-el" onclick="player.double(currentHand)">DOUBLE</button>
-        <button id="insurance-el" onclick="player.insurance(currentHand)">INSURANCE</button>
-        <button id="split-el" onclick="player.split(currentHand)">SPLIT</button>
-        <br>
-        <button id="start-el" onclick="startRound()">STARTGAME</button>
+        <div id="actionButtons-el", style="visibility:hidden">
+            <button id="hit-el" onclick="game.player.hit(game, game.currentHand)">HIT</button>
+            <button id="stand-el" onclick="game.player.stand(game, game.currentHand)">STAND</button>
+            <br>
+            <button id="double-el" onclick="game.player.double(game, game.currentHand)">DOUBLE</button>
+            <button id="insurance-el" onclick="game.player.insurance(game)">INSURANCE</button>
+            <button id="split-el" onclick="game.player.split(game, game.currentHand)">SPLIT</button>
+        </div>
         <br>
         <div>Bet:</div>
         <input id="bet-el" type="number" value="100" step = "50" min="50"/>
+        <br>
+        <button id="start-el" onclick="game.startRound()">NEW ROUND</button>
         <p id="chips-el"></p>
         
         <script src="index.js"></script>
