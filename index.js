@@ -37,6 +37,7 @@ class Deck {
         //const values = ["ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace"]
         const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace"]
         this.deck = []
+        this.shuffleFlag = false
 
 
         for (let i = 0; i < this.packsOfCards; i++) {
@@ -64,19 +65,21 @@ class Deck {
     }
 
     draw() {
+        //draw and check if cards have to be shuffled before next round
         let cardsInPack = 52
-        //draw or first reset and reset deck
-        //console.log(this.packsOfCards * cardsInPack * this.reshufleAt)
-        if (this.deck.length > this.packsOfCards * cardsInPack * this.reshufleAt) {
-            let cardProperties = this.deck.pop() //[suit, value]
-            return new Card(cardProperties[0], cardProperties[1])
-        }
-        else {
+
+        //just in case
+        if (this.deck.length == 0) {
             this.reset()
-            this.shuffle()
-            console.log('deck shuffled')
-            return this.draw()
+            this.shuffle
         }
+        
+        if (this.deck.length < this.packsOfCards * cardsInPack * this.reshufleAt) {
+            this.shuffleFlag = true
+        }
+        let cardProperties = this.deck.pop() //[suit, value]
+        return new Card(cardProperties[0], cardProperties[1])
+        
     }
 }
 
@@ -195,7 +198,7 @@ class Player {
         if (this.canDouble(hand)) {
                 hand.isInPlay = false
                 this.chips -= this.bet
-                hand.bet *= 2
+                hand.bet *= 3
                 hand.dealOne(game.deck)
                 sumEl.textContent = "sum: " + hand.sum
                 game.nextHand()
@@ -261,7 +264,7 @@ class Player {
 
         else if (hand.sum === 21 && hand.cards.length === 2 && !(game.dealer.hand.cards.length == 2 && game.dealer.hand.sum == 21)) {
             //players wins blackjack
-            this.chips += Math.round(this.bet * (eval(BlackJackPayout) + 1))
+            this.chips += Math.round(this.bet * (eval(game.BlackJackPayout) + 1))
             messageEl.textContent = "BlackJack win!"
         }
 
@@ -320,6 +323,7 @@ class Game {
         this.dealer = new Dealer(DealerHitsSoft17)
         this.settings = 0
         this.currentHand = this.player.hands[0]
+        this.BlackJackPayout = BlackJackPayout
         this.n = 0
         this.startRound()
     }
@@ -338,6 +342,11 @@ class Game {
             console.log(this.player.hands)
             this.dealer.hand.clear()
             this.player.chips -= this.player.bet
+            if (this.deck.shuffleFlag === true){
+                this.deck.reset()
+                this.deck.shuffle()
+                messageEl.textContent = "Cards have been reshuffled."
+            }
             this.player.hands[0].dealOne(this.deck)
             this.player.hands[0].dealOne(this.deck)
             this.dealer.hand.dealOne(this.deck, true) //faceDown = true
@@ -347,6 +356,9 @@ class Game {
             chipsEl.textContent = "chips: " + this.player.chips
             this.n = 0
             this.disableUnavailableActions()
+            if (this.player.hands[0].sum === 21) {
+                this.player.hands[0].resolve()
+            }
         }
         
         else {messageEl.textContent = "Invalid bet"}
