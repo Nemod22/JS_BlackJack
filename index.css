@@ -1,6 +1,10 @@
 body {
-    background-color: #016f32;
-    background-size: cover;
+    /* background-color: #34864f; */
+    background: radial-gradient(#389155, #225834);
+    height: 100%;
+    margin: 0;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     text-align: center;
     color: white;
     position: center;
