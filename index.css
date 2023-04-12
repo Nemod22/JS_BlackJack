@@ -1,6 +1,6 @@
 body {
     /* background-color: #34864f; */
-    background: radial-gradient(#389155, #225834);
+    background: radial-gradient(#437e48, #215225);
     height: 100%;
     margin: 0;
     background-repeat: no-repeat;
@@ -12,6 +12,8 @@ body {
 
 #settings-el {
     background-color: rgb(53, 53, 53);
+    width: 500px;
+    margin: 0 auto;
 }
 
 h1 {

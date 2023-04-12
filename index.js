@@ -33,6 +33,7 @@ class Deck {
 
     reset() {
         const suits = ["hearts", "spades", "diamonds", "clubs"]
+        //const values = ["ace", "ace", "ace", "ace", "ace", "ace", "10", "10", "10", "10", "10", "10", "10",]
         //const values = ["5", "5", "5", "5", "5", "5", "5", "5", "5", "5", "5", "5", "5", ]
         //const values = ["ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace"]
         const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace"]
@@ -285,7 +286,12 @@ class Player {
         }
         actionButtons.style.visibility = 'hidden'
         document.getElementById("start-el").style.visibility = 'visible'
+        document.getElementById("bet-el").disabled = false
         chipsEl.textContent = "chips: " + game.player.chips
+        if(this.chips === 0){
+            messageEl.textContent = "Out of chips, game over!"
+            document.getElementById("restart-el").style.display = 'inline'
+        }
     }
 
 }
@@ -317,14 +323,15 @@ class Game {
         let BlackJackPayout = document.getElementById('BlackJackPayout').value
         let DealerHitsSoft17 = (document.getElementById('DealerHitsSoft17').value == "Yes") //sets variable to true or false
         let ReshuffleDeckAt = Number(document.getElementById('ReshuffleDeckAt').value)
+        let SrartingChips = Number(document.getElementById('SrartingChips').value)
+
 
         this.deck = new Deck(deckCount, ReshuffleDeckAt)
-        this.player = new Player
+        this.player = new Player(SrartingChips)
         this.dealer = new Dealer(DealerHitsSoft17)
-        this.settings = 0
         this.currentHand = this.player.hands[0]
         this.BlackJackPayout = BlackJackPayout
-        this.n = 0
+        this.n = 0 //curent hand index to be renamed
         this.startRound()
     }
 
@@ -332,6 +339,7 @@ class Game {
         this.player.bet = document.getElementById("bet-el").value
         settingsEl.style.display = 'none' //'block' to make visible
         if (this.player.bet > 0 && this.player.bet <= this.player.chips) {
+            document.getElementById("bet-el").disabled = true
             document.getElementById("start-el").style.visibility = 'hidden'
             actionButtons.style.visibility = 'visible'
             messageEl.textContent = "_"
@@ -357,6 +365,7 @@ class Game {
             this.n = 0
             this.disableUnavailableActions()
             if (this.player.hands[0].sum === 21) {
+                this.dealer.play()
                 this.player.resolve(this, this.player.hands[0])
             }
         }
