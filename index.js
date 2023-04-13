@@ -35,8 +35,8 @@ class Deck {
         const suits = ["hearts", "spades", "diamonds", "clubs"]
         //const values = ["ace", "ace", "ace", "ace", "ace", "ace", "10", "10", "10", "10", "10", "10", "10",]
         //const values = ["5", "5", "5", "5", "5", "5", "5", "5", "5", "5", "5", "5", "5", ]
-        //const values = ["ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace"]
-        const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace"]
+        const values = ["ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace"]
+        //const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace"]
         this.deck = []
         this.shuffleFlag = false
 
@@ -129,6 +129,14 @@ class Hand {
         return this.sumFun()[1]
     }
 
+    fade() {
+        this.CardsEl.style.opacity = '0.5'
+    }
+
+    unfade() {
+        this.CardsEl.style.opacity = '1'
+    }
+
     clear() {
         this.cards = []
         this.CardsEl.innerHTML = ""
@@ -160,7 +168,7 @@ class Player {
     }
 
     removeAllButFirstHand() {
-        //let hand = 
+        this.hands[0].unfade() 
         this.hands = [this.hands[0]]
     }
 
@@ -207,7 +215,7 @@ class Player {
     }
     
     canInsure(game) {
-        if (game.dealer.hand.cards[1].value === "ace" && this.insuranceFlag === false && this.chips >= this.bet){
+        if (game.dealer.hand.cards.lenght === 2, game.dealer.hand.cards[1].value === "ace" && this.insuranceFlag === false && this.chips >= this.bet){
             return true
         }
         return false
@@ -218,7 +226,7 @@ class Player {
             this.insuranceFlag = true;
             this.chips -= (this.bet * 1)
             messageEl.textContent = "insured"
-            console.log("insured")
+            // console.log("insured")
             game.disableUnavailableActions()
         }
     }
@@ -244,6 +252,7 @@ class Player {
             let newhand = new Hand(document.getElementById(`PlayerCards-el${this.hands.length}`))
             newhand.cards.push(secondCard)
             this.hands.push(newhand)
+            newhand.fade()
             hand.dealOne(game.deck)
             newhand.dealOne(game.deck)
             hand.rerender()
@@ -332,13 +341,13 @@ class Game {
         this.currentHand = this.player.hands[0]
         this.BlackJackPayout = BlackJackPayout
         this.n = 0 //curent hand index to be renamed
-        this.startRound()
+        settingsEl.style.display = 'none' //'block' to make visible
+        //this.startRound()
     }
 
     startRound() {
         this.player.bet = document.getElementById("bet-el").value
-        settingsEl.style.display = 'none' //'block' to make visible
-        if (this.player.bet > 0 && this.player.bet <= this.player.chips) {
+        if (this.player.bet > 0 && this.player.bet <= this.player.chips && this.player.bet % 1 === 0) {
             document.getElementById("bet-el").disabled = true
             document.getElementById("start-el").style.visibility = 'hidden'
             actionButtons.style.visibility = 'visible'
@@ -391,18 +400,27 @@ class Game {
     async nextHand() {
         this.n += 1
         if (this.n < this.player.hands.length) {
+            this.currentHand.fade()
             this.currentHand = this.player.hands[this.n]
+            this.currentHand.unfade()
             sumEl.textContent = this.currentHand.sum
             console.log(this.currentHand)
         }
         else {
+            if (this.player.hands.length > 1) {
+                this.currentHand.fade()
+            }
             await this.dealer.play()
             this.player.insurancePayout(this)
             await sleep(1000)
             for (let i = 0; i < this.player.hands.length; i++) {
                 let hand = this.player.hands[i]
+                hand.unfade()
                 this.player.resolve(this, hand)
                 await sleep(2000)
+                if (this.player.hands.length > 1) {
+                    hand.fade()
+                }
             }
         } 
     }
