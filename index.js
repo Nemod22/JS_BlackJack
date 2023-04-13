@@ -215,7 +215,7 @@ class Player {
     }
     
     canInsure(game) {
-        if (game.dealer.hand.cards.lenght === 2, game.dealer.hand.cards[1].value === "ace" && this.insuranceFlag === false && this.chips >= this.bet){
+        if (game.dealer.hand.cards[1].value === "ace" && this.insuranceFlag === false && this.chips >= this.bet){
             return true
         }
         return false
@@ -405,8 +405,12 @@ class Game {
             this.currentHand.unfade()
             sumEl.textContent = this.currentHand.sum
             console.log(this.currentHand)
+            this.disableUnavailableActions()
         }
         else {
+            document.getElementById("double-el").disabled = true;
+            document.getElementById("insurance-el").disabled = true;
+            document.getElementById("split-el").disabled = true;
             if (this.player.hands.length > 1) {
                 this.currentHand.fade()
             }
