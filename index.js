@@ -33,10 +33,7 @@ class Deck {
 
     reset() {
         const suits = ["hearts", "spades", "diamonds", "clubs"]
-        //const values = ["ace", "ace", "ace", "ace", "ace", "ace", "10", "10", "10", "10", "10", "10", "10",]
-        //const values = ["5", "5", "5", "5", "5", "5", "5", "5", "5", "5", "5", "5", "5", ]
-        const values = ["ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace"]
-        //const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace"]
+        const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace"]
         this.deck = []
         this.shuffleFlag = false
 
@@ -75,7 +72,7 @@ class Deck {
             this.shuffle
         }
         
-        if (this.deck.length < this.packsOfCards * cardsInPack * this.reshufleAt) {
+        if (this.deck.length < this.packsOfCards * cardsInPack * (this.reshufleAt)) {
             this.shuffleFlag = true
         }
         let cardProperties = this.deck.pop() //[suit, value]
@@ -334,7 +331,6 @@ class Game {
         let ReshuffleDeckAt = Number(document.getElementById('ReshuffleDeckAt').value)
         let SrartingChips = Number(document.getElementById('SrartingChips').value)
 
-
         this.deck = new Deck(deckCount, ReshuffleDeckAt)
         this.player = new Player(SrartingChips)
         this.dealer = new Dealer(DealerHitsSoft17)
@@ -342,7 +338,7 @@ class Game {
         this.BlackJackPayout = BlackJackPayout
         this.n = 0 //curent hand index to be renamed
         settingsEl.style.display = 'none' //'block' to make visible
-        //this.startRound()
+        bettingEl.style.visibility = 'visible'
     }
 
     startRound() {
@@ -353,7 +349,6 @@ class Game {
             actionButtons.style.visibility = 'visible'
             messageEl.textContent = "_"
             this.player.hands[0].isInPlay = true
-            //player.hands[0].clear()
             this.player.clearHands()
             this.player.removeAllButFirstHand()
             console.log(this.player.hands)
@@ -439,5 +434,6 @@ let messageEl = document.getElementById("message-el")
 let sumEl = document.getElementById("sum-el")
 let chipsEl = document.getElementById("chips-el")
 let settingsEl = document.getElementById("settings-el")
+let bettingEl = document.getElementById("betting-el")
 
 let game = new Game
