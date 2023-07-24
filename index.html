@@ -4,7 +4,9 @@
         <link rel="stylesheet" href="index.css">
     </head>
     <body>
+        <h1>BLACKJACK</h1>
         <div id="settings-el">
+            <h3>Game rules:</h3>
         <!-- 
             deck count
             deck penetration
@@ -13,7 +15,6 @@
             dealer hits on soft 17
             max hands allowed
          -->
-            <br>
             <label for="deckCount">Number of decks:</label>
             <select name="deckCount" id="deckCount">
                 <option value="1">1</option>
@@ -38,16 +39,20 @@
                 <option value="Yes">Yes</option>
             </select>
             <br>
-            <label for="ReshuffleDeckAt">Reshuffle shoe at:</label>
+            <label for="ReshuffleDeckAt">Reshuffle at:</label>
             <input id="ReshuffleDeckAt" name="ReshuffleDeckAt"type="number" min="0" max="1" step="0.01" value="0.5"/>
+            <br>
+            <label for="SrartingChips">Starting chips:</label>
+            <input id="SrartingChips" name="SrartingChips"type="number" min="0" max="100000" step="10" value="1000"/>
             <br>
             <button onclick="game.reset()">START GAME</button>
 
         </div>
 
-        <h1>BLACKJACK</h1>
+
         <div id="DealerCards-el"></div>
         <p id="message-el"></p>
+        <button id="restart-el" style="display:none;" onclick="location.reload()">PLAY AGAIN</button>
         <div id="PlayerHands-el"></div>
             <div id="PlayerCards-el"></div>
             <div id="PlayerCards-el1"></div>
@@ -65,12 +70,13 @@
             <button id="split-el" onclick="game.player.split(game, game.currentHand)">SPLIT</button>
         </div>
         <br>
-        <div>Bet:</div>
-        <input id="bet-el" type="number" value="100" step = "50" min="50"/>
-        <br>
-        <button id="start-el" onclick="game.startRound()">NEW ROUND</button>
-        <p id="chips-el"></p>
-        
+        <div id="betting-el", style="visibility:hidden">
+            <div>Bet:</div>
+            <input id="bet-el" type="number" value="100" step = "50" min="50"/>
+            <br>
+            <button id="start-el" onclick="game.startRound()">NEW ROUND</button>
+            <p id="chips-el"></p>
+        </div>
         <script src="index.js"></script>
     </body>
 </html>

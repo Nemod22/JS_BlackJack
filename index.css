@@ -1,6 +1,11 @@
 body {
-    background-color: #016f32;
-    background-size: cover;
+    /* background-color: #34864f; */
+    font-family: Arial, sans-serif;
+    background: radial-gradient(#437e48, #215225);
+    height: 100%;
+    margin: 0;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     text-align: center;
     color: white;
     position: center;
@@ -8,6 +13,19 @@ body {
 
 #settings-el {
     background-color: rgb(53, 53, 53);
+    width: 500px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    margin: 0 auto;
+}
+
+select, input[type="number"] {
+    margin: 5px;
+}
+
+button {
+    margin: 2px;
 }
 
 h1 {

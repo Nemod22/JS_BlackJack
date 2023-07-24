@@ -33,8 +33,6 @@ class Deck {
 
     reset() {
         const suits = ["hearts", "spades", "diamonds", "clubs"]
-        //const values = ["5", "5", "5", "5", "5", "5", "5", "5", "5", "5", "5", "5", "5", ]
-        //const values = ["ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace", "ace"]
         const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace"]
         this.deck = []
         this.shuffleFlag = false
@@ -74,7 +72,7 @@ class Deck {
             this.shuffle
         }
         
-        if (this.deck.length < this.packsOfCards * cardsInPack * this.reshufleAt) {
+        if (this.deck.length < this.packsOfCards * cardsInPack * (this.reshufleAt)) {
             this.shuffleFlag = true
         }
         let cardProperties = this.deck.pop() //[suit, value]
@@ -128,6 +126,14 @@ class Hand {
         return this.sumFun()[1]
     }
 
+    fade() {
+        this.CardsEl.style.opacity = '0.5'
+    }
+
+    unfade() {
+        this.CardsEl.style.opacity = '1'
+    }
+
     clear() {
         this.cards = []
         this.CardsEl.innerHTML = ""
@@ -159,7 +165,7 @@ class Player {
     }
 
     removeAllButFirstHand() {
-        //let hand = 
+        this.hands[0].unfade() 
         this.hands = [this.hands[0]]
     }
 
@@ -188,7 +194,7 @@ class Player {
     }
     
     canDouble(hand) {
-        if (hand.isInPlay === true && hand.cards.length === 2) {
+        if (hand.isInPlay === true && hand.cards.length === 2 && this.chips >= this.bet) {
             return true
         }
         return false
@@ -198,7 +204,7 @@ class Player {
         if (this.canDouble(hand)) {
                 hand.isInPlay = false
                 this.chips -= this.bet
-                hand.bet *= 3
+                this.bet *= 2
                 hand.dealOne(game.deck)
                 sumEl.textContent = "sum: " + hand.sum
                 game.nextHand()
@@ -206,7 +212,7 @@ class Player {
     }
     
     canInsure(game) {
-        if (game.dealer.hand.cards[1].value === "ace" && this.insuranceFlag === false){
+        if (game.dealer.hand.cards[1].value === "ace" && this.insuranceFlag === false && this.chips >= this.bet){
             return true
         }
         return false
@@ -217,7 +223,7 @@ class Player {
             this.insuranceFlag = true;
             this.chips -= (this.bet * 1)
             messageEl.textContent = "insured"
-            console.log("insured")
+            // console.log("insured")
             game.disableUnavailableActions()
         }
     }
@@ -230,7 +236,7 @@ class Player {
     }
     
     canSplit(hand) {
-        if (hand.cards[0].value === hand.cards[1].value && hand.cards.length === 2 && this.hands.length < 4) {
+        if (hand.cards[0].value === hand.cards[1].value && hand.cards.length === 2 && this.hands.length < 4 && this.chips >= this.bet) {
             return true
         }
         return false
@@ -243,6 +249,7 @@ class Player {
             let newhand = new Hand(document.getElementById(`PlayerCards-el${this.hands.length}`))
             newhand.cards.push(secondCard)
             this.hands.push(newhand)
+            newhand.fade()
             hand.dealOne(game.deck)
             newhand.dealOne(game.deck)
             hand.rerender()
@@ -285,7 +292,12 @@ class Player {
         }
         actionButtons.style.visibility = 'hidden'
         document.getElementById("start-el").style.visibility = 'visible'
+        document.getElementById("bet-el").disabled = false
         chipsEl.textContent = "chips: " + game.player.chips
+        if(this.chips === 0){
+            messageEl.textContent = "Out of chips, game over!"
+            document.getElementById("restart-el").style.display = 'inline'
+        }
     }
 
 }
@@ -317,26 +329,26 @@ class Game {
         let BlackJackPayout = document.getElementById('BlackJackPayout').value
         let DealerHitsSoft17 = (document.getElementById('DealerHitsSoft17').value == "Yes") //sets variable to true or false
         let ReshuffleDeckAt = Number(document.getElementById('ReshuffleDeckAt').value)
+        let SrartingChips = Number(document.getElementById('SrartingChips').value)
 
         this.deck = new Deck(deckCount, ReshuffleDeckAt)
-        this.player = new Player
+        this.player = new Player(SrartingChips)
         this.dealer = new Dealer(DealerHitsSoft17)
-        this.settings = 0
         this.currentHand = this.player.hands[0]
         this.BlackJackPayout = BlackJackPayout
-        this.n = 0
-        this.startRound()
+        this.n = 0 //curent hand index to be renamed
+        settingsEl.style.display = 'none' //'block' to make visible
+        bettingEl.style.visibility = 'visible'
     }
 
     startRound() {
         this.player.bet = document.getElementById("bet-el").value
-        settingsEl.style.display = 'none' //'block' to make visible
-        if (this.player.bet > 0 && this.player.bet <= this.player.chips) {
+        if (this.player.bet > 0 && this.player.bet <= this.player.chips && this.player.bet % 1 === 0) {
+            document.getElementById("bet-el").disabled = true
             document.getElementById("start-el").style.visibility = 'hidden'
             actionButtons.style.visibility = 'visible'
             messageEl.textContent = "_"
             this.player.hands[0].isInPlay = true
-            //player.hands[0].clear()
             this.player.clearHands()
             this.player.removeAllButFirstHand()
             console.log(this.player.hands)
@@ -357,7 +369,8 @@ class Game {
             this.n = 0
             this.disableUnavailableActions()
             if (this.player.hands[0].sum === 21) {
-                this.player.hands[0].resolve()
+                this.dealer.play()
+                this.player.resolve(this, this.player.hands[0])
             }
         }
         
@@ -382,18 +395,31 @@ class Game {
     async nextHand() {
         this.n += 1
         if (this.n < this.player.hands.length) {
+            this.currentHand.fade()
             this.currentHand = this.player.hands[this.n]
+            this.currentHand.unfade()
             sumEl.textContent = this.currentHand.sum
             console.log(this.currentHand)
+            this.disableUnavailableActions()
         }
         else {
+            document.getElementById("double-el").disabled = true;
+            document.getElementById("insurance-el").disabled = true;
+            document.getElementById("split-el").disabled = true;
+            if (this.player.hands.length > 1) {
+                this.currentHand.fade()
+            }
             await this.dealer.play()
             this.player.insurancePayout(this)
             await sleep(1000)
             for (let i = 0; i < this.player.hands.length; i++) {
                 let hand = this.player.hands[i]
+                hand.unfade()
                 this.player.resolve(this, hand)
                 await sleep(2000)
+                if (this.player.hands.length > 1) {
+                    hand.fade()
+                }
             }
         } 
     }
@@ -408,5 +434,6 @@ let messageEl = document.getElementById("message-el")
 let sumEl = document.getElementById("sum-el")
 let chipsEl = document.getElementById("chips-el")
 let settingsEl = document.getElementById("settings-el")
+let bettingEl = document.getElementById("betting-el")
 
 let game = new Game
