@@ -398,7 +398,7 @@ class Game {
             this.currentHand.fade()
             this.currentHand = this.player.hands[this.n]
             this.currentHand.unfade()
-            sumEl.textContent = this.currentHand.sum
+            sumEl.textContent = "sum: " + this.currentHand.sum
             console.log(this.currentHand)
             this.disableUnavailableActions()
         }
