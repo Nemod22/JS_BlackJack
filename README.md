@@ -1,5 +1,5 @@
 # JS_BlackJack
-Black Jack game, that should be accurate enogh to practice card counting with diffrent game rules. It also includes doubling down, spliting and insurance.
+Black Jack game, that should be accurate enough to practice card counting with different game rules. It also includes doubling down, splitting and insurance.
 
 Try it yourself: https://nemod22.github.io/JS_BlackJack/
 
